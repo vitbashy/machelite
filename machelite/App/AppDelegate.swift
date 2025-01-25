@@ -1,27 +1,31 @@
 import Cocoa
 import SwiftUI
+import ApplicationServices
 
-@main
 class AppDelegate: NSObject, NSApplicationDelegate {
-    // Our main window and status bar item
-    private var window: NSWindow?
+    // Our key properties
     private var statusItem: NSStatusItem?
-    
-    // Managers for different functionalities
     private var popoverManager: PopoverManager?
     private var shortcutManager: ShortcutManager?
     private var translationService: TranslationService?
     
+    // This creates our status bar item and window
+    private func requestPermissions() {
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+        AXIsProcessTrustedWithOptions(options as CFDictionary)
+    }
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Request necessary permissions first
+        requestPermissions()
+        
         // Initialize our services
         translationService = TranslationService(apiKey: Constants.deeplAPIKey)
         shortcutManager = ShortcutManager()
         popoverManager = PopoverManager()
         
-        // Setup status bar item
+        // Setup our UI elements
         setupStatusBar()
-        
-        // Setup global shortcut
         setupShortcut()
     }
     
@@ -56,25 +60,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func handleShortcutPressed() {
-        // Get selected text using pasteboard (clipboard)
         let pasteboard = NSPasteboard.general
         guard let selectedText = pasteboard.string(forType: .string) else { return }
         
-        // Update the original text in our view
         popoverManager?.updateOriginalText(selectedText)
         
-        // Show the popover
         if let button = statusItem?.button {
             popoverManager?.show(relativeTo: button.bounds, of: button)
             
-            // Translate the text
             translationService?.translate(selectedText) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let translatedText):
                         self?.popoverManager?.updateTranslatedText(translatedText)
                     case .failure(let error):
-                        // Handle error - we'll add error handling later
                         print("Translation error: \(error)")
                     }
                 }
@@ -83,8 +82,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-private func requestPermissions() {
-    // Request accessibility permissions
-    let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
-    AXIsProcessTrustedWithOptions(options as CFDictionary)
+// Add this at the bottom of AppDelegate.swift
+@main
+struct macheliteApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
+    var body: some Scene {
+        Settings {
+            EmptyView()
+        }
+    }
 }
