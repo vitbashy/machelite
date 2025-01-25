@@ -14,6 +14,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         AXIsProcessTrustedWithOptions(options as CFDictionary)
     }
     
+    private func requestAccessibilityPermissions() {
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+        AXIsProcessTrustedWithOptions(options as CFDictionary)
+    }
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
         
         requestPermissions()
@@ -24,7 +29,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         setupStatusBar()
         setupShortcut()
+        requestAccessibilityPermissions()
     }
+    
+    
     
     private func setupStatusBar() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)

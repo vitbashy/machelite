@@ -6,20 +6,14 @@ class ShortcutManager {
     var shortcutHandler: (() -> Void)?
     
     func registerGlobalShortcut() {
-        shortcutMonitor = NSEvent.addGlobalMonitorForEvents(
-            matching: .keyDown
+        NSEvent.addGlobalMonitorForEvents(
+            matching: [.keyDown, .flagsChanged]
         ) { [weak self] event in
-            // Check for Control + Y
+            // Control + T
             if event.modifierFlags.contains(.control) &&
-               event.keyCode == UInt16(kVK_ANSI_Y) {
+               event.keyCode == kVK_ANSI_T {
                 self?.shortcutHandler?()
             }
-        }
-    }
-    
-    deinit {
-        if let monitor = shortcutMonitor {
-            NSEvent.removeMonitor(monitor)
         }
     }
 }
