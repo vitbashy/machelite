@@ -29,9 +29,30 @@
 		FDE091532D4560C00084AF86 /* macheliteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = macheliteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		FD5FE4802D45688600CACA6B /* Exceptions for "machelite" folder in "macheliteTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FDE091482D4560C00084AF86 /* macheliteTests */;
+		};
+		FD5FE4812D45688600CACA6B /* Exceptions for "machelite" folder in "macheliteUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FDE091522D4560C00084AF86 /* macheliteUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FDE0913A2D4560BF0084AF86 /* machelite */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FD5FE4802D45688600CACA6B /* Exceptions for "machelite" folder in "macheliteTests" target */,
+				FD5FE4812D45688600CACA6B /* Exceptions for "machelite" folder in "macheliteUITests" target */,
+			);
 			path = machelite;
 			sourceTree = "<group>";
 		};
