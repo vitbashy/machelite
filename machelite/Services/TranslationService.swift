@@ -7,22 +7,41 @@ class TranslationService {
         self.apiKey = apiKey
     }
     
+    // In TranslationService.swift
     func translate(_ text: String, completion: @escaping (Result<String, Error>) -> Void) {
-        guard let url = URL(string: Constants.deeplBaseURL) else {
+        print("Starting translation for text: \(text)")
+        
+        let config = URLSessionConfiguration.default
+        config.allowsCellularAccess = true
+        config.allowsExpensiveNetworkAccess = true
+        config.allowsConstrainedNetworkAccess = true
+        let session = URLSession(configuration: config)
+        
+        guard var urlComponents = URLComponents(string: Constants.deeplBaseURL) else {
+            completion(.failure(TranslationError.invalidURL))
+            return
+        }
+        
+        let parameters = [
+            URLQueryItem(name: "text", value: text),
+            URLQueryItem(name: "target_lang", value: "UK")
+        ]
+        urlComponents.queryItems = parameters
+        
+        guard let url = urlComponents.url else {
             completion(.failure(TranslationError.invalidURL))
             return
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue("DeepL-Auth-Key \(apiKey)", forHTTPHeaderField: "Authorization")
         
-        let parameters = "text=\(text)&target_lang=UK"
-        request.httpBody = parameters.data(using: .utf8)
+        print("Making request to: \(url)")
         
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        let task = session.dataTask(with: request) { data, response, error in
             if let error = error {
+                print("Network error: \(error)")
                 completion(.failure(error))
                 return
             }
@@ -40,6 +59,10 @@ class TranslationService {
                     completion(.failure(TranslationError.noTranslation))
                 }
             } catch {
+                print("Decoding error: \(error)")
+                if let responseString = String(data: data, encoding: .utf8) {
+                    print("Response data: \(responseString)")
+                }
                 completion(.failure(error))
             }
         }
