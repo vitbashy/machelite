@@ -1,10 +1,10 @@
 import Cocoa
 import SwiftUI
 
-class PopoverManager {
+class PopoverManager: ObservableObject {
     private var popover: NSPopover
-    @State private var originalText: String = ""
-    @State private var translatedText: String = ""
+    @Published var originalText: String = ""
+    @Published var translatedText: String = ""
     
     init() {
         self.popover = NSPopover()
@@ -12,19 +12,9 @@ class PopoverManager {
     }
     
     private func setupPopover() {
-        popover.contentSize = NSSize(
-            width: Constants.windowWidth,
-            height: Constants.windowHeight
-        )
+        popover.contentSize = NSSize(width: Constants.windowWidth, height: Constants.windowHeight)
         popover.behavior = .transient
-        
-        let contentView = TranslationView(
-            originalText: .constant(originalText),
-            translatedText: .constant(translatedText)
-        )
-        popover.contentViewController = NSHostingController(
-            rootView: contentView
-        )
+        updateView()
     }
     
     func show(relativeTo rect: NSRect, of view: NSView) {
@@ -42,12 +32,11 @@ class PopoverManager {
     }
     
     private func updateView() {
-        let contentView = TranslationView(
-            originalText: .constant(originalText),
-            translatedText: .constant(translatedText)
-        )
         popover.contentViewController = NSHostingController(
-            rootView: contentView
+            rootView: TranslationView(
+                originalText: .constant(originalText),
+                translatedText: .constant(translatedText)
+            )
         )
     }
 }

@@ -1,4 +1,3 @@
-// Models/TranslationResponse.swift
 struct TranslationResponse: Codable {
     let translations: [Translation]
 }
