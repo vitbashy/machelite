@@ -10,8 +10,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var translationService: TranslationService?
     
     private func requestPermissions() {
-        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
-        AXIsProcessTrustedWithOptions(options as CFDictionary)
+        // Force prompt for accessibility permissions
+        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as NSString: true]
+        let accessibilityEnabled = AXIsProcessTrustedWithOptions(options)
+        print("Accessibility enabled:", accessibilityEnabled)
+        
+        // Add hardened runtime entitlements
+        if !AXIsProcessTrusted() {
+            print("App not trusted - requesting permissions")
+            let securityOptions = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+            AXIsProcessTrustedWithOptions(securityOptions as CFDictionary)
+        }
     }
     
     private func requestAccessibilityPermissions() {
@@ -20,7 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        
+        print("Now I will request permissions")
         requestPermissions()
         
         translationService = TranslationService(apiKey: Constants.deeplAPIKey)
