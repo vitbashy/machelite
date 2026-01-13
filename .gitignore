@@ -4,6 +4,7 @@ settings.json
 # Plans (private development docs)
 docs/plans/
 plan.md
+claude.md
 
 # Xcode
 *.xcuserstate
