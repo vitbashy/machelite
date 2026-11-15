@@ -289,9 +289,9 @@ private struct AppearanceSettings: View {
                                 AppIconArtwork(style: icon)
                                     .frame(width: 44, height: 44)
                                     .background {
-                                        RoundedRectangle(cornerRadius: 11)
+                                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                                             .strokeBorder(settings.appIcon(isDark: theme.colorScheme == .dark) == icon ? theme.accent : .clear,
-                                                          lineWidth: 2)
+                                                          lineWidth: 1.5)
                                     }
                                     .contentShape(Rectangle())
                             }

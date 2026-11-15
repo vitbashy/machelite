@@ -60,22 +60,22 @@ struct AppIconArtwork: View {
                     shape.fill(RadialGradient(colors: [.white.opacity(0.45), .clear],
                                               center: UnitPoint(x: 0.18, y: 0),
                                               startRadius: 0, endRadius: tile * 0.66))
+                    // clip the reflection to the same contour as the enamel face
+                    Ellipse()
+                        .fill(LinearGradient(colors: [.white.opacity(0.32), .white.opacity(0.015)],
+                                              startPoint: .top, endPoint: .bottom))
+                        .frame(width: tile * 1.5, height: tile * 0.85)
+                        .rotationEffect(.degrees(-16))
+                        .offset(x: -tile * 0.12, y: -tile * 0.40)
+                        .frame(width: tile, height: tile)
+                        .clipShape(shape)
                     shape.strokeBorder(LinearGradient(stops: [
-                        .init(color: .white.opacity(0.95), location: 0),
-                        .init(color: .white.opacity(0.2), location: 0.45),
-                        .init(color: palette[3], location: 0.75),
-                        .init(color: .white.opacity(0.75), location: 1),
+                        .init(color: .white.opacity(0.65), location: 0),
+                        .init(color: .white.opacity(0.12), location: 0.45),
+                        .init(color: palette[3].opacity(0.3), location: 0.75),
+                        .init(color: .white.opacity(0.15), location: 1),
                     ], startPoint: .topLeading, endPoint: .bottomTrailing),
                     lineWidth: size * 2 / 256)
-                    RoundedRectangle(cornerRadius: tile * 0.20, style: .continuous)
-                        .strokeBorder(.white.opacity(0.22), lineWidth: size / 256)
-                        .padding(size * 4 / 256)
-                    EnamelReflection()
-                        .fill(LinearGradient(stops: [
-                            .init(color: .white.opacity(0.48), location: 0),
-                            .init(color: .white.opacity(0.054), location: 0.48),
-                            .init(color: .clear, location: 1),
-                        ], startPoint: .topLeading, endPoint: .bottom))
                 }
                 .frame(width: tile, height: tile)
                 .shadow(color: rgb(0x142c29).opacity(0.28), radius: size * 10 / 256,
@@ -110,24 +110,6 @@ struct AppIconArtwork: View {
         }
         .shadow(color: palette[3].opacity(0.65), radius: size * 3 * 1.32 / 256,
                 y: size * 5 * 1.32 / 256)
-    }
-}
-
-private struct EnamelReflection: Shape {
-    func path(in rect: CGRect) -> Path {
-        func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
-            CGPoint(x: rect.minX + x * rect.width, y: rect.minY + y * rect.height)
-        }
-        var path = Path()
-        path.move(to: point(0.045, 0.33))
-        path.addLine(to: point(0.045, 0.225))
-        path.addQuadCurve(to: point(0.225, 0.045), control: point(0.045, 0.045))
-        path.addLine(to: point(0.77, 0.045))
-        path.addQuadCurve(to: point(0.95, 0.16), control: point(0.9, 0.045))
-        path.addQuadCurve(to: point(0.47, 0.37), control: point(0.69, 0.23))
-        path.addQuadCurve(to: point(0.045, 0.47), control: point(0.23, 0.50))
-        path.closeSubpath()
-        return path
     }
 }
 
