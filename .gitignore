@@ -1,67 +1,20 @@
-# Settings with API keys
+.DS_Store
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.profraw
+.swiftpm/
+.build/
 settings.json
-
-# Plans (private development docs)
 docs/plans/
 plan.md
 claude.md
-
-# Xcode
-*.xcuserstate
-*.xcworkspace
-!*.xcworkspace/contents.xcworkspacedata
-xcuserdata/
-DerivedData/
-*.moved-aside
-*.hmap
-*.ipa
-*.dSYM.zip
-*.dSYM
-build/
-
-# Swift Package Manager
-.swiftpm/
-.build/
-Packages/
-Package.pins
-Package.resolved
-
-# CocoaPods
-Pods/
-*.podspec
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-Icon
-._*
-
-# Thumbnails
-.Trashes
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-# Claude Code
 .claude/
 .claudesync/
-
-# IDE
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
-.vscode/
-.idea/
+design/
