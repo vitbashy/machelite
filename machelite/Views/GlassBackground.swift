@@ -73,10 +73,14 @@ private struct GlassWindowRim: View {
 
 struct GlassCapsule: ViewModifier {
     let theme: Theme
+    var flat = false
 
     @ViewBuilder
     func body(content: Content) -> some View {
-        if theme.reduceTransparency {
+        if flat {
+            content.background(theme.reduceTransparency ? theme.controlSolid : theme.rowTint, in: Capsule())
+                .overlay(Capsule().strokeBorder(theme.rim.opacity(0.7), lineWidth: 0.7))
+        } else if theme.reduceTransparency {
             content.background(theme.controlSolid, in: Capsule())
                 .overlay(Capsule().strokeBorder(theme.hairline, lineWidth: 0.7))
         } else if #available(macOS 26.0, *) {

@@ -24,7 +24,6 @@ final class TranslatorModel: ObservableObject {
     @Published private(set) var continuationsError: String?
 
     @Published private(set) var needsPermission = false
-    // another app may already own the chosen shortcut
     @Published var shortcutUnavailable = false
 
     private var translateTask: Task<Void, Never>?
@@ -41,9 +40,7 @@ final class TranslatorModel: ObservableObject {
     private var sourceSnapshot = ""
     // keep alternatives tied to the source language of this translation
     private var sourceLanguageSnapshot = Languages.autoCode
-    // typing must not realign the language pair
-    private var lastInputLength = 0
-    // shortcut text arrives as a complete selection
+    private var previousInput = ""
     private var arrivedWhole = false
 
     private init() {}
@@ -82,9 +79,9 @@ final class TranslatorModel: ObservableObject {
         detectedCode = reading?.code
 
         // realign on whole selections or pastes, never ordinary typing
-        let growth = inputText.count - lastInputLength
-        lastInputLength = inputText.count
-        if LanguagePairResolver.shouldRealign(text: inputText, growth: growth,
+        let previous = previousInput
+        previousInput = inputText
+        if LanguagePairResolver.shouldRealign(text: inputText, previous: previous,
                                               arrivedWhole: arrivedWhole, detected: reading) {
             realignPairIfTranslatingIntoItself(reading?.code)
         }
@@ -96,11 +93,9 @@ final class TranslatorModel: ObservableObject {
         debounceTask?.cancel()
         translateTask?.cancel()
         translationGeneration &+= 1
-        // clear errors belonging to superseded input
         errorMessage = nil
 
         if isTranslating {
-            // discard partial output when its input changes
             isTranslating = false
             outputText = ""
             rawOutput = ""
@@ -115,7 +110,6 @@ final class TranslatorModel: ObservableObject {
         }
     }
 
-    // avoid requesting a translation into the detected source language
     private func realignPairIfTranslatingIntoItself(_ detected: String?) {
         guard let detected,
               let pair = LanguagePairResolver.realigned(
@@ -127,8 +121,8 @@ final class TranslatorModel: ObservableObject {
 
         DiagnosticsLog.shared.record(
             .request,
-            "Text is \(Languages.label(detected)) but the target was too — "
-            + "switched to \(Languages.label(pair.source)) → \(Languages.label(pair.target))")
+            "Text looks like \(Languages.label(detected)) — switched to "
+            + "\(Languages.label(pair.source)) → \(Languages.label(pair.target))")
 
         settings.sourceLanguage = pair.source
         settings.targetLanguage = pair.target
@@ -402,7 +396,7 @@ final class TranslatorModel: ObservableObject {
     }
 
     func receive(_ text: String) {
-        // a complete shortcut selection may realign without increasing input length
+        // shortcut selections may realign even when only a few characters change
         arrivedWhole = true
         inputText = text
         translateNow()
