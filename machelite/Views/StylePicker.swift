@@ -8,7 +8,7 @@ struct StylePicker: View {
     @State private var isPresented = false
 
     var body: some View {
-        PickerCapsule(label: settings.style.title, isOpen: isPresented, compact: true) {
+        PickerCapsule(label: settings.style.title, isOpen: isPresented) {
             isPresented.toggle()
         }
         .accessibilityLabel("Translation style")

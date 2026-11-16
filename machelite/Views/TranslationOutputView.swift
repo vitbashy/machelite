@@ -37,10 +37,17 @@ private struct WordView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, Typography.wordPadding)
                 .padding(.vertical, 1)
-                .background(
-                    RoundedRectangle(cornerRadius: 4, style: .continuous)
-                        .fill(isActive ? theme.accent.opacity(0.30)
-                                       : (hovering ? theme.primaryText.opacity(0.08) : .clear)))
+                .background {
+                    // Only the highlighted word owns a shape; a clear fill per
+                    // word is still a view to lay out and composite.
+                    if isActive {
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .fill(theme.accent.opacity(0.30))
+                    } else if hovering {
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .fill(theme.primaryText.opacity(0.08))
+                    }
+                }
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

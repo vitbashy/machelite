@@ -42,7 +42,7 @@ final class TranslatorModel: ObservableObject {
     // keep alternatives tied to the source language of this translation
     private var sourceLanguageSnapshot = Languages.autoCode
     // typing must not realign the language pair
-    private var lastInputLength = 0
+    private var previousInput = ""
     // shortcut text arrives as a complete selection
     private var arrivedWhole = false
 
@@ -82,9 +82,9 @@ final class TranslatorModel: ObservableObject {
         detectedCode = reading?.code
 
         // realign on whole selections or pastes, never ordinary typing
-        let growth = inputText.count - lastInputLength
-        lastInputLength = inputText.count
-        if LanguagePairResolver.shouldRealign(text: inputText, growth: growth,
+        let previous = previousInput
+        previousInput = inputText
+        if LanguagePairResolver.shouldRealign(text: inputText, previous: previous,
                                               arrivedWhole: arrivedWhole, detected: reading) {
             realignPairIfTranslatingIntoItself(reading?.code)
         }
@@ -127,8 +127,8 @@ final class TranslatorModel: ObservableObject {
 
         DiagnosticsLog.shared.record(
             .request,
-            "Text is \(Languages.label(detected)) but the target was too — "
-            + "switched to \(Languages.label(pair.source)) → \(Languages.label(pair.target))")
+            "Text looks like \(Languages.label(detected)) — switched to "
+            + "\(Languages.label(pair.source)) → \(Languages.label(pair.target))")
 
         settings.sourceLanguage = pair.source
         settings.targetLanguage = pair.target

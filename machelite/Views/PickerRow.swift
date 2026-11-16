@@ -63,7 +63,8 @@ struct PickerRow: View {
 struct PickerCapsule: View {
     let label: String
     let isOpen: Bool
-    var compact: Bool = false
+    var compact = true
+    var regularWidth: CGFloat = 180
     let action: () -> Void
 
     @Environment(\.theme) private var theme
@@ -77,34 +78,36 @@ struct PickerCapsule: View {
                         chevron
                     }
                     .padding(.horizontal, 13)
+                    .frame(height: 29)
                 } else {
-                    title
-                        .padding(.horizontal, 12)
-                        .frame(width: 130)
-                        .frame(width: 150, alignment: .leading)
-                        .overlay(alignment: .trailing) {
-                            chevron.frame(width: 12).frame(width: 40)
-                        }
+                    HStack(spacing: 0) {
+                        title
+                            .minimumScaleFactor(0.85)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        chevron.frame(width: 24)
+                    }
+                    .padding(.horizontal, 16)
+                    .frame(width: regularWidth, height: 40)
                 }
             }
-            .frame(height: compact ? 29 : 40)
-            .modifier(GlassCapsule(theme: theme))
+            .modifier(GlassCapsule(theme: theme, flat: true))
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
     }
 
     private var title: some View {
-                Text(label)
-                    .font(.system(size: compact ? 13 : 15, weight: .medium))
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+        Text(label)
+            .font(.system(size: compact ? 13 : 15, weight: .medium))
+            .lineLimit(1)
+            .truncationMode(.tail)
+            .multilineTextAlignment(.center)
     }
 
     private var chevron: some View {
-                Image(systemName: isOpen ? "chevron.up" : "chevron.down")
-                    .font(.system(size: compact ? 9 : 11, weight: .semibold))
-                    .foregroundStyle(theme.primaryText)
+        Image(systemName: isOpen ? "chevron.up" : "chevron.down")
+            .font(.system(size: compact ? 9 : 11, weight: .semibold))
+            .foregroundStyle(theme.primaryText)
     }
 }
 
