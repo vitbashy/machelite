@@ -73,7 +73,6 @@ private struct GlassWindowRim: View {
 
 struct GlassCapsule: ViewModifier {
     let theme: Theme
-    // a flat surface keeps selectors consistent without extra glass shadows
     var flat = false
 
     @ViewBuilder

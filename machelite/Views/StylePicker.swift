@@ -43,7 +43,6 @@ struct StylePickerPanel: View {
             }
         }
         .padding(.vertical, Constants.pickerRowInset)
-        // keep the style picker sized to its labels
         .frame(minWidth: 150)
         .fixedSize(horizontal: true, vertical: false)
         .pickerPanel(theme)

@@ -25,12 +25,10 @@ enum LanguageDetector {
     }
 }
 
-// avoid translating the detected language into itself
 enum LanguagePairResolver {
     static let minimumConfidence = 0.80
     static let minimumLength = 12
 
-    // only complete selections or paste-sized changes may realign languages
     static func shouldRealign(text: String,
                               previous: String,
                               arrivedWhole: Bool,
@@ -40,16 +38,13 @@ enum LanguagePairResolver {
         guard text.trimmingCharacters(in: .whitespacesAndNewlines).count >= minimumLength
         else { return false }
         if arrivedWhole { return true }
-        // Net growth misses the commonest paste of all — select all, paste —
-        // where 500 characters are swapped for 500 others. What matters is how
-        // much of the text is new, so ignore the untouched head and tail.
+        // detect replacement pastes even when the total length stays the same
         let head = text.commonPrefix(with: previous).count
         let tail = commonSuffixCount(text, previous, ignoringFirst: head)
         return text.count - head - tail >= minimumLength
     }
 
-    /// Characters shared at the end of both strings, never reaching back into
-    /// the `ignoringFirst` characters already counted as a common prefix.
+    // exclude the prefix already counted so the shared ranges never overlap
     private static func commonSuffixCount(_ a: String, _ b: String,
                                           ignoringFirst head: Int) -> Int {
         var i = a.endIndex
@@ -69,7 +64,6 @@ enum LanguagePairResolver {
                           source: String,
                           target: String,
                           preferred: [String]) -> (source: String, target: String)? {
-        // The text is in the language we were about to translate *into*.
         if detected == target {
             // reverse an explicit pair
             if source != Languages.autoCode, source != detected {
@@ -82,9 +76,7 @@ enum LanguagePairResolver {
             return (source: source, target: replacement)
         }
 
-        // The target is fine but the source is wrong — the prompt would claim
-        // the text is a language it plainly isn't, and models answer that by
-        // echoing the input back untranslated.
+        // correct the source without changing the user's target
         guard source != Languages.autoCode, source != detected else { return nil }
         return (source: detected, target: target)
     }

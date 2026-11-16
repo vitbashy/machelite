@@ -329,7 +329,6 @@ private struct AboutMark: View {
             VStack(spacing: 2) {
                 HStack(spacing: 0) {
                     Text("made with love by ")
-                    // make the author link discoverable
                     Link(destination: Constants.authorURL) {
                         Text("vitbashy")
                             .fontWeight(.semibold)

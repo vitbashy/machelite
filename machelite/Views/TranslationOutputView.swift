@@ -38,8 +38,7 @@ private struct WordView: View {
                 .padding(.horizontal, Typography.wordPadding)
                 .padding(.vertical, 1)
                 .background {
-                    // Only the highlighted word owns a shape; a clear fill per
-                    // word is still a view to lay out and composite.
+                    // skip background layers for words that are not highlighted
                     if isActive {
                         RoundedRectangle(cornerRadius: 4, style: .continuous)
                             .fill(theme.accent.opacity(0.30))

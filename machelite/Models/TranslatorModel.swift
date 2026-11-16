@@ -24,7 +24,6 @@ final class TranslatorModel: ObservableObject {
     @Published private(set) var continuationsError: String?
 
     @Published private(set) var needsPermission = false
-    // another app may already own the chosen shortcut
     @Published var shortcutUnavailable = false
 
     private var translateTask: Task<Void, Never>?
@@ -41,9 +40,7 @@ final class TranslatorModel: ObservableObject {
     private var sourceSnapshot = ""
     // keep alternatives tied to the source language of this translation
     private var sourceLanguageSnapshot = Languages.autoCode
-    // typing must not realign the language pair
     private var previousInput = ""
-    // shortcut text arrives as a complete selection
     private var arrivedWhole = false
 
     private init() {}
@@ -96,11 +93,9 @@ final class TranslatorModel: ObservableObject {
         debounceTask?.cancel()
         translateTask?.cancel()
         translationGeneration &+= 1
-        // clear errors belonging to superseded input
         errorMessage = nil
 
         if isTranslating {
-            // discard partial output when its input changes
             isTranslating = false
             outputText = ""
             rawOutput = ""
@@ -115,7 +110,6 @@ final class TranslatorModel: ObservableObject {
         }
     }
 
-    // avoid requesting a translation into the detected source language
     private func realignPairIfTranslatingIntoItself(_ detected: String?) {
         guard let detected,
               let pair = LanguagePairResolver.realigned(
@@ -402,7 +396,7 @@ final class TranslatorModel: ObservableObject {
     }
 
     func receive(_ text: String) {
-        // a complete shortcut selection may realign without increasing input length
+        // shortcut selections may realign even when only a few characters change
         arrivedWhole = true
         inputText = text
         translateNow()

@@ -45,7 +45,6 @@ struct LanguagePickerPanel: View {
     @State private var query = ""
     @State private var showingAll = false
     @State private var highlighted = 0
-    // fit the panel to its rows
     @State private var contentHeight: CGFloat = 0
 
     private enum Row: Identifiable {

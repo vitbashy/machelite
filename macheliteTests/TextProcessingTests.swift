@@ -323,8 +323,6 @@ struct LanguagePairResolverTests {
     }
 
     @Test func editingInTheMiddleNeverFlipsThePair() {
-        // Only one character changed, but everything after it shifts — a naive
-        // prefix check would read that as a fresh paste.
         let before = "чому такий широкий текст у вікні програми"
         let after = "чому такий ширoкий текст у вікні програми"
         #expect(!LanguagePairResolver.shouldRealign(
@@ -332,8 +330,6 @@ struct LanguagePairResolverTests {
     }
 
     @Test func selectAllAndPasteRealignsEvenWithoutGrowth() {
-        // The case that shipped broken: 495 characters swapped for 493, so net
-        // growth was negative and the pair stayed on the old language.
         let german = String(repeating: "Das Entwicklungsteam schreibt die Schicht neu. ", count: 8)
         let ukrainian = String(repeating: "Команда розробників переписує шар синхронізації. ", count: 8)
         #expect(LanguagePairResolver.shouldRealign(
@@ -348,8 +344,6 @@ struct LanguagePairResolverTests {
     }
 
     @Test func aWrongSourceIsCorrectedWhileTheTargetStands() {
-        // German text in an explicit English → Ukrainian pair: the target is
-        // what the user wants, only the source is a lie.
         let pair = LanguagePairResolver.realigned(
             detected: "de", source: "en", target: "uk", preferred: ["en", "uk"])
         #expect(pair?.source == "de")
