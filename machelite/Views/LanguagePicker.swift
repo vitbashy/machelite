@@ -5,7 +5,6 @@ struct LanguagePicker: View {
     let isSource: Bool
     let label: String
     var detected: String?
-    var width: CGFloat = 180
     var onChange: () -> Void = {}
 
     @EnvironmentObject private var settings: AppSettings
@@ -13,7 +12,7 @@ struct LanguagePicker: View {
     @State private var isPresented = false
 
     var body: some View {
-        PickerCapsule(label: label, isOpen: isPresented, compact: false, regularWidth: width) {
+        PickerCapsule(label: label, isOpen: isPresented) {
             isPresented.toggle()
         }
         .accessibilityLabel(isSource ? "Source language" : "Target language")
@@ -45,6 +44,7 @@ struct LanguagePickerPanel: View {
     @State private var query = ""
     @State private var showingAll = false
     @State private var highlighted = 0
+    // fit the panel to its rows
     @State private var contentHeight: CGFloat = 0
 
     private enum Row: Identifiable {

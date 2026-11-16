@@ -16,7 +16,7 @@ struct TranslatorView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack(spacing: 16) {
-                languageBar(availableWidth: geometry.size.width - 40)
+                languageBar
                 OriginalCard(focused: $inputFocused)
                     .frame(height: originalHeight(in: geometry.size))
                 TranslationCard()
@@ -52,27 +52,18 @@ struct TranslatorView: View {
             with: CGSize(width: width, height: .greatestFiniteMagnitude),
             options: [.usesLineFragmentOrigin, .usesFontLeading],
             attributes: [.font: NSFont.systemFont(ofSize: theme.type.body)])
-        let chromeHeight = CardLayout.headerHeight + CardLayout.contentSpacing + CardLayout.padding * 2
-        let readingHeight = bounds.height * 1.4 + chromeHeight
-        let minimumHeight = max(132, theme.type.body * 2 + 90)
-        return min(max(minimumHeight, readingHeight),
-                   max(minimumHeight, min(260, available.height * 0.34)))
+        let readingHeight = bounds.height * 1.4 + 62
+        return min(max(118, readingHeight), max(118, min(260, available.height * 0.34)))
     }
 
-    private func languageBar(availableWidth: CGFloat) -> some View {
-        let labels = [model.sourceLabel, Languages.label(settings.targetLanguage)]
-        let font = NSFont.systemFont(ofSize: 15, weight: .medium)
-        let labelWidth = labels.map { ($0 as NSString).size(withAttributes: [.font: font]).width }.max() ?? 0
-        let pickerWidth = min(max(180, ceil(labelWidth) + 64), max(180, (availableWidth - 58) / 2))
-
-        return HStack(spacing: 12) {
+    private var languageBar: some View {
+        HStack(spacing: 12) {
             Spacer(minLength: 0)
 
             LanguagePicker(selection: $settings.sourceLanguage,
                            isSource: true,
                            label: model.sourceLabel,
                            detected: model.detectedCode,
-                           width: pickerWidth,
                            onChange: { model.retranslate() })
 
             Button(action: { model.swapLanguages() }) {
@@ -89,19 +80,12 @@ struct TranslatorView: View {
             LanguagePicker(selection: $settings.targetLanguage,
                            isSource: false,
                            label: Languages.label(settings.targetLanguage),
-                           width: pickerWidth,
                            onChange: { model.retranslate() })
 
             Spacer(minLength: 0)
         }
         .environment(\.theme, theme)
     }
-}
-
-private enum CardLayout {
-    static let headerHeight: CGFloat = 29
-    static let contentSpacing: CGFloat = 12
-    static let padding: CGFloat = 22
 }
 
 private struct OriginalCard: View {
@@ -111,11 +95,10 @@ private struct OriginalCard: View {
     @FocusState.Binding var focused: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: CardLayout.contentSpacing) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("Original")
                 .font(.system(size: theme.type.cardLabel, weight: .semibold))
                 .foregroundStyle(theme.cardLabelInk)
-                .frame(height: CardLayout.headerHeight)
 
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $model.inputText)
@@ -140,7 +123,7 @@ private struct OriginalCard: View {
                 }
             }
         }
-        .padding(CardLayout.padding)
+        .padding(22)
         .frame(maxWidth: .infinity, alignment: .leading)
         .glassCard(theme, tint: theme.originalTint, solid: theme.originalSolid, radius: 22)
     }
@@ -153,8 +136,8 @@ private struct TranslationCard: View {
     @State private var justCopied = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: CardLayout.contentSpacing) {
-            header.frame(height: CardLayout.headerHeight)
+        VStack(alignment: .leading, spacing: 16) {
+            header
 
             if let error = model.errorMessage {
                 failure(error)
@@ -173,7 +156,7 @@ private struct TranslationCard: View {
                 .frame(maxHeight: .infinity, alignment: .top)
             }
         }
-        .padding(CardLayout.padding)
+        .padding(22)
         .frame(maxWidth: .infinity, alignment: .leading)
         .glassCard(theme, tint: theme.translationTint, solid: theme.translationSolid, radius: 22)
     }
@@ -329,6 +312,7 @@ private struct AboutMark: View {
             VStack(spacing: 2) {
                 HStack(spacing: 0) {
                     Text("made with love by ")
+                    // make the author link discoverable
                     Link(destination: Constants.authorURL) {
                         Text("vitbashy")
                             .fontWeight(.semibold)

@@ -37,16 +37,10 @@ private struct WordView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, Typography.wordPadding)
                 .padding(.vertical, 1)
-                .background {
-                    // skip background layers for words that are not highlighted
-                    if isActive {
-                        RoundedRectangle(cornerRadius: 4, style: .continuous)
-                            .fill(theme.accent.opacity(0.30))
-                    } else if hovering {
-                        RoundedRectangle(cornerRadius: 4, style: .continuous)
-                            .fill(theme.primaryText.opacity(0.08))
-                    }
-                }
+                .background(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .fill(isActive ? theme.accent.opacity(0.30)
+                                       : (hovering ? theme.primaryText.opacity(0.08) : .clear)))
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

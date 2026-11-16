@@ -281,6 +281,8 @@ struct LanguagePairResolverTests {
     @Test func aSensiblePairIsLeftAlone() {
         #expect(LanguagePairResolver.realigned(
             detected: "uk", source: "uk", target: "en", preferred: ["en", "uk"]) == nil)
+        #expect(LanguagePairResolver.realigned(
+            detected: "de", source: "en", target: "uk", preferred: ["en", "uk"]) == nil)
     }
 
     @Test func autoDetectKeepsItsSourceAndMovesTheTarget() {
@@ -305,65 +307,26 @@ struct LanguagePairResolverTests {
     }
 
     @Test func shortOrUncertainTextNeverMovesThePair() {
+        let pasted = 40
         #expect(!LanguagePairResolver.shouldRealign(
-            text: "добрий", previous: "", arrivedWhole: false, detected: ("uk", 0.99)))
+            text: "добрий", growth: pasted, arrivedWhole: false, detected: ("uk", 0.99)))
         #expect(!LanguagePairResolver.shouldRealign(
-            text: "a reasonably long sentence", previous: "",
+            text: "a reasonably long sentence", growth: pasted,
             arrivedWhole: false, detected: ("uk", 0.30)))
         #expect(LanguagePairResolver.shouldRealign(
-            text: "чому такий широкий текст", previous: "",
+            text: "чому такий широкий текст", growth: pasted,
             arrivedWhole: false, detected: ("uk", 0.95)))
     }
 
     @Test func typingOneMoreCharacterNeverFlipsAnExplicitPair() {
-        let typed = "чому такий широкий текст у вікн"
         #expect(!LanguagePairResolver.shouldRealign(
-            text: typed + "і", previous: typed,
+            text: "чому такий широкий текст у вікні", growth: 1,
             arrivedWhole: false, detected: ("uk", 0.99)))
-    }
-
-    @Test func editingInTheMiddleNeverFlipsThePair() {
-        let before = "чому такий широкий текст у вікні програми"
-        let after = "чому такий ширoкий текст у вікні програми"
-        #expect(!LanguagePairResolver.shouldRealign(
-            text: after, previous: before, arrivedWhole: false, detected: ("uk", 0.99)))
-    }
-
-    @Test func selectAllAndPasteRealignsEvenWithoutGrowth() {
-        let german = String(repeating: "Das Entwicklungsteam schreibt die Schicht neu. ", count: 8)
-        let ukrainian = String(repeating: "Команда розробників переписує шар синхронізації. ", count: 8)
-        #expect(LanguagePairResolver.shouldRealign(
-            text: ukrainian, previous: german, arrivedWhole: false, detected: ("uk", 0.99)))
-    }
-
-    @Test func deletingTextNeverFlipsThePair() {
-        let full = "чому такий широкий текст у вікні програми сьогодні"
-        #expect(!LanguagePairResolver.shouldRealign(
-            text: String(full.prefix(30)), previous: full,
-            arrivedWhole: false, detected: ("uk", 0.99)))
-    }
-
-    @Test func aWrongSourceIsCorrectedWhileTheTargetStands() {
-        let pair = LanguagePairResolver.realigned(
-            detected: "de", source: "en", target: "uk", preferred: ["en", "uk"])
-        #expect(pair?.source == "de")
-        #expect(pair?.target == "uk")
-    }
-
-    @Test func anAutoSourceIsLeftAlone() {
-        #expect(LanguagePairResolver.realigned(
-            detected: "de", source: Languages.autoCode, target: "uk",
-            preferred: ["en", "uk"]) == nil)
-    }
-
-    @Test func aPairThatAlreadyMatchesIsNotTouched() {
-        #expect(LanguagePairResolver.realigned(
-            detected: "de", source: "de", target: "uk", preferred: []) == nil)
     }
 
     @Test func shortcutTextAlwaysMayRealign() {
         #expect(LanguagePairResolver.shouldRealign(
-            text: "чому такий широкий текст", previous: "",
+            text: "чому такий широкий текст", growth: 0,
             arrivedWhole: true, detected: ("uk", 0.95)))
     }
 

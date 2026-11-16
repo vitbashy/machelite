@@ -8,7 +8,7 @@ struct StylePicker: View {
     @State private var isPresented = false
 
     var body: some View {
-        PickerCapsule(label: settings.style.title, isOpen: isPresented) {
+        PickerCapsule(label: settings.style.title, isOpen: isPresented, compact: true) {
             isPresented.toggle()
         }
         .accessibilityLabel("Translation style")
@@ -43,6 +43,7 @@ struct StylePickerPanel: View {
             }
         }
         .padding(.vertical, Constants.pickerRowInset)
+        // keep the style picker sized to its labels
         .frame(minWidth: 150)
         .fixedSize(horizontal: true, vertical: false)
         .pickerPanel(theme)
