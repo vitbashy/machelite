@@ -78,7 +78,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             .store(in: &cancellables)
 
-        promptForPermissionOnce()
+        TranslatorModel.shared.$needsPermission
+            .removeDuplicates()
+            .sink { [weak self] needs in
+                // rearm monitors when accessibility is granted during this launch
+                guard !needs else { return }
+                self?.shortcuts.reapply()
+            }
+            .store(in: &cancellables)
+
+        promptForPermissionIfNeeded()
         startPermissionWatch()
 
     }
@@ -119,13 +128,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         TranslatorModel.shared.receive(text)
     }
 
-    private func promptForPermissionOnce() {
+    private func promptForPermissionIfNeeded() {
         guard AppSettings.shared.shortcut.needsKeystrokePermission else { return }
         guard !KeystrokePermission.isGranted else { return }
-
-        let key = "didPromptForAccessibility"
-        guard !UserDefaults.standard.bool(forKey: key) else { return }
-        UserDefaults.standard.set(true, forKey: key)
+        // a new code signature can revoke a previous accessibility grant
         KeystrokePermission.request()
     }
 

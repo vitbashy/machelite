@@ -3,10 +3,7 @@ import Carbon.HIToolbox
 import IOKit.hid
 
 enum KeystrokePermission {
-    static var isGranted: Bool {
-        if AXIsProcessTrusted() { return true }
-        return IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) == kIOHIDAccessTypeGranted
-    }
+    static var isGranted: Bool { AXIsProcessTrusted() }
 
     static func request() {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
@@ -50,6 +47,13 @@ final class ShortcutManager {
         }
     }
 
+    // reinstall monitors created before accessibility was granted
+    func reapply() {
+        guard let spec = current else { return }
+        current = nil
+        apply(spec)
+    }
+
     func teardown() {
         [globalMonitor, localMonitor].forEach { if let monitor = $0 { NSEvent.removeMonitor(monitor) } }
         globalMonitor = nil
@@ -64,6 +68,14 @@ final class ShortcutManager {
     deinit { teardown() }
 
     private func installMonitors() {
+        let trusted = AXIsProcessTrusted()
+        let listening = IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) == kIOHIDAccessTypeGranted
+        Task { @MainActor in
+            DiagnosticsLog.shared.record(
+                .request,
+                "Watching for ⌘C⌘C — Accessibility: \(trusted), Input Monitoring: \(listening)")
+        }
+
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.keyDown]) { [weak self] event in
             self?.handleObserved(event)
         }
@@ -75,6 +87,9 @@ final class ShortcutManager {
 
     private func handleObserved(_ event: NSEvent) {
         guard let spec = current, spec.matches(event) else { return }
+        Task { @MainActor in
+            DiagnosticsLog.shared.record(.request, "Saw \(spec.display) press")
+        }
         // event timestamps are monotonic
         register(press: event.timestamp, spec: spec)
     }
