@@ -377,9 +377,6 @@ private final class SegmentHostView: NSView {
         if #available(macOS 26.0, *) {
             control.borderShape = .capsule
         }
-        if #available(macOS 27.0, *) {
-            control.role = .tabs
-        }
         control.segmentDistribution = .fillEqually
         control.controlSize = .large
         control.font = .systemFont(ofSize: 14)
@@ -390,7 +387,7 @@ private final class SegmentHostView: NSView {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func setGlassEnabled(_ enabled: Bool) {
-        if #available(macOS 27.0, *) {
+        if #available(macOS 26.0, *) {
             needsLayout = true
             return
         }
@@ -400,7 +397,6 @@ private final class SegmentHostView: NSView {
                 let effect = NSGlassEffectView()
                 effect.style = .clear
                 effect.cornerRadius = 20
-                if #available(macOS 27.0, *) { effect.effectIsInteractive = true }
                 effect.contentView = control
                 addSubview(effect)
                 glass = effect
